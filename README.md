@@ -1,75 +1,27 @@
-# React + TypeScript + Vite
+# Vitoo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Plateforme de réservation de trajets interurbains : les passagers réservent et paient leurs billets, les compagnies gèrent trajets, véhicules et chauffeurs, les chauffeurs suivent leurs départs, et un espace admin supervise l'ensemble.
 
-Currently, two official plugins are available:
+## Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- `/` — frontend React + Vite + Tailwind (TypeScript), empaquetable en application mobile avec Capacitor
+- `backend/` — API Express + Prisma (SQLite), projet npm séparé (voir [backend/README.md](backend/README.md))
 
-## React Compiler
+## Démarrage en local
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+# API (terminal 1)
+cd backend && cp .env.example .env && npm install && npx prisma db push && npm run dev
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+# Frontend (terminal 2, à la racine)
+npm install
+npm run dev   # http://localhost:5173
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Variables du frontend (fichier `.env.local` à la racine) : `VITE_API_URL`, `VITE_GOOGLE_CLIENT_ID`, `VITE_MAPBOX_PUBLIC_TOKEN`, `VITE_MAPBOX_STYLE`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+En dev, la page d'accueil affiche un sélecteur d'espaces (`/dev`) ; en production, `/` redirige vers l'espace passager.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Déploiement
 
-```
+Voir [README.DEPLOYEMENT.md](README.DEPLOYEMENT.md) (Render, Vercel, Docker, CinetPay).

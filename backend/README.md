@@ -1,31 +1,37 @@
-# Vitoo Auth Backend
+# Vitoo Backend
 
-API d'authentification indépendante du frontend Vitoo.
+API Express + Prisma (SQLite) de Vitoo : authentification (passagers, compagnies, chauffeurs, admin), trajets, réservations, billets, paiements CinetPay et notifications SMS/e-mail.
 
 ## Démarrage
 
 ```bash
 cd backend
+cp .env.example .env   # puis remplir les valeurs
 npm install
+npx prisma db push     # crée/synchronise la base SQLite (pas de migrations)
+npm run seed           # optionnel : crée un compte admin de dev
 npm run dev
 ```
 
-Le serveur écoute sur `http://localhost:4000`.
+Le serveur écoute sur `http://localhost:4000`. Les données sont persistées dans la base SQLite indiquée par `DATABASE_URL`.
 
-## Routes
+## Routes (préfixes)
 
-- `GET /api/health`
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/forgot-password`
-- `GET /api/auth/me` avec `Authorization: Bearer <token>`
-- `PATCH /api/auth/me` avec `Authorization: Bearer <token>`
-- `GET /api/admin/users` avec `x-admin-key: <ADMIN_API_KEY>`
+| Préfixe | Rôle |
+|---|---|
+| `GET /api/health` | Santé du service |
+| `/api/auth` | Auth passager (mot de passe, Google, téléphone) |
+| `/api/company/auth`, `/api/company` | Auth et espace compagnie (chauffeurs, véhicules, trajets, billets, messages, stats) |
+| `/api/driver/auth`, `/api/driver` | Auth et espace chauffeur |
+| `/api/trips`, `/api/payments` | Trajets et paiements côté passager |
+| `/api/admin` | Administration — JWT avec le rôle `admin` requis |
+| `GET /api/dev/reset?token=…` | Vide la base ; actif seulement si `RESET_TOKEN` est défini |
 
-Le stockage actuel est en mémoire pour le prototypage. Les comptes sont perdus au redémarrage du serveur.
+## Compte administrateur
 
-Pour consulter les comptes inscrits :
+- En dev : `npm run seed` crée un admin de test.
+- En prod : définir `ADMIN_BOOTSTRAP_PHONE` et `ADMIN_BOOTSTRAP_PASSWORD` ; l'admin est créé au démarrage s'il n'en existe aucun.
 
-```bash
-curl http://localhost:4000/api/admin/users -H "x-admin-key: change-this-admin-key"
-```
+## Scripts de débogage
+
+`scripts/dev/` contient des scripts jetables qui appellent l'API locale (`http://localhost:4000`) avec des comptes de test. Ce ne sont pas des tests automatisés et ils ne sont pas inclus dans l'image Docker.
